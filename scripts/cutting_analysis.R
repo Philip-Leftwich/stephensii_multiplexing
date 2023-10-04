@@ -14,6 +14,25 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
 
 ### 03.10.23====
 
+
+### 04.10.23====
+
+new <- result_df %>% 
+  fill(`F1 cross`) %>% 
+  mutate(`F1 cross` = str_replace_all(`F1 cross`, "\\bME\\b", "")) %>% 
+  mutate(`F1 cross` = str_replace_all(`F1 cross`, "\\bDE\\b", "")) %>% 
+  mutate(`F1 cross` = str_replace_all(`F1 cross`, "32 \\*", "")) %>% 
+  mutate(`F1 cross` = str_replace(`F1 cross`, "50\\*", "")) %>% 
+  mutate(`F1 cross` = str_trim(`F1 cross`)) %>% 
+  separate(`F1 cross`, 
+           into = c("female", "male"), 
+           sep = "(?<=\\])|(?=\\[)|(?<=\\))|(?=\\()", 
+           extra = "merge", 
+           fill = "left", remove = F) 
+
+new <- if_else(new$`female`== "", separate(new,`F1 cross`, into = c("female", "male"), sep = "((?<=\\))|(?<=\\]))", extra = "merge", fill = "right", remove = FALSE), new)
+ 
+
 cutting_data <- cutting_tbl %>% 
   rename(`F1 cross`=1,
          genotype_A=4,
