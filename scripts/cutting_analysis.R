@@ -1,38 +1,95 @@
 
 
-font_add_google("Open Sans", "Sans")
-
 source("scripts/functions.R")
 source("scripts/custom_theme.R")
+library(DHARMa)
+library(lmerTest)
+library(glmmTMB)
+font_add_google("Open Sans", "Sans")
 
 ### homing and mosaic data
 
 file_paths <- list.files(path="./data/", pattern = "*.xlsx", full.names = T) 
 sheet_nums <- c(3,2,2,3,3,3,2,2)
 
-result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:I300")))
+result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:I300")))%>% 
+    fill(`F1 cross`) %>% 
+  drop_na(`Female no.`)
 
 ### 03.10.23====
 
 
 ### 04.10.23====
 
-new <- result_df %>% 
-  fill(`F1 cross`) %>% 
-  mutate(`F1 cross` = str_replace_all(`F1 cross`, "\\bME\\b", "")) %>% 
-  mutate(`F1 cross` = str_replace_all(`F1 cross`, "\\bDE\\b", "")) %>% 
-  mutate(`F1 cross` = str_replace_all(`F1 cross`, "32 \\*", "")) %>% 
-  mutate(`F1 cross` = str_replace(`F1 cross`, "50\\*", "")) %>% 
-  mutate(`F1 cross` = str_trim(`F1 cross`)) %>% 
-  separate(`F1 cross`, 
-           into = c("female", "male"), 
-           sep = "(?<=\\])|(?=\\[)|(?<=\\))|(?=\\()", 
-           extra = "merge", 
-           fill = "left", remove = F) 
+#new <- result_df %>% 
+#  fill(`F1 cross`) %>% 
+#  mutate(phenotype = case_when(
+#    str_detect(`F1 cross`, "\\bME\\b") ~ "Mosaic",
+#    str_detect(`F1 cross`, "\\bDE\\b") ~ "Dark",
+#    .default = "other")) %>% 
+  
+  
+ # Create a data frame of unique strings and assign group letters
+ unique_strings <- result_df %>%
+      distinct(`F1 cross`) %>%
+       mutate(group_letter = letters[1:n()])
 
-new <- if_else(new$`female`== "", separate(new,`F1 cross`, into = c("female", "male"), sep = "((?<=\\))|(?<=\\]))", extra = "merge", fill = "right", remove = FALSE), new)
- 
+   # Merge the original data frame with the unique strings data frame
+   new <- result_df %>%
+       left_join(unique_strings, by = "F1 cross")
+   
+   homing_data <- new %>% 
+     mutate(cas9_parent = if_else(group_letter %in% c("a","b","d","e","g","i","k","l","m","p","q","r","s"), "Male", "Female")) %>% 
+     mutate(gRNA_type = case_when(group_letter %in% c("a","b","c","d","e","f","g","h","i","j","k") ~ "1759",
+                                  group_letter %in% c("l", "m", "n", "o") ~ "2072",
+                                  group_letter %in% c("p", "q") ~ "2273",
+                                  group_letter %in% c("r", "s") ~ "2301")) %>% 
+     mutate(target_locus = if_else(gRNA_type %in% c("1759", "2072", "2301"), "locus A", "locus B")) %>% 
+     mutate(multiplex = if_else(gRNA_type == "2301", "yes", "no")) %>% 
+     mutate(pre_cut = if_else(group_letter %in% c("a","c","e","g","h","i","j","k","q","s"), "yes", "no"))%>% 
+     mutate(id=row_number())%>% 
+     mutate(win = (A+AB),
+            loss = (B+WT)) 
+  
 
+
+
+#======================
+   
+# All crosses
+   
+   model <- glmmTMB((cbind(win,loss))~ group_letter+(1|group_letter/id), family=binomial, data=homing_data)
+   sim <- simulateResiduals(model)
+   plot(sim, asFactor = T)
+   
+#======================   
+   # Homing against resistance
+   
+   locus_a <- homing_data %>% 
+     filter(target_locus %in% c("locus A"))
+   
+   model2 <- glm((cbind(win,loss))~ gRNA_type*pre_cut, family=binomial, data=locus_a)
+  # model2 <- glmmTMB((cbind(win,loss))~ cas9_parent*gRNA_type*pre_cut+(1|id), family=binomial, data=locus_a)
+   model2 <- glmer((cbind(win,loss))~ gRNA_type*pre_cut+(1|id), family=binomial, data=locus_a)
+
+#======================   
+   # Cas9 parent effect
+   
+   model3 <- glmer((cbind(win,loss))~ cas9_parent*pre_cut+(1|id), family=binomial, data=locus_a)
+ # Cas9 parent affects homing rate when pre cut allele is present
+   
+#=====================
+   
+   model4 <- glmer((cbind(win,loss))~ cas9_parent*gRNA_type+(1|id), family=binomial, data=locus_a)
+# No interaction between Cas9 parent and gRNA type 
+     
+#====================
+# Most crosses are male Cas9 parent
+   male_cas9 <- homing_data %>% 
+     filter(cas9_parent %in% c("male"))
+   
+#=====================
+   
 cutting_data <- cutting_tbl %>% 
   rename(`F1 cross`=1,
          genotype_A=4,
