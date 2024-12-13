@@ -11,21 +11,13 @@ required <- list("tidyverse",
                  "MuMIn",
                  "ggh4x",
                 "glmmTMB",
-                "emmeans")
+                "emmeans",
+                "gt",
+                "ggVennDiagram",
+                "ggtext")
 
 lapply(required, library, character.only = T)
 
-library(tidyverse)
-library(readxl)
-library(ggbeeswarm)
-library(ggdark) #desaturate()
-library(colorspace) #lighten()
-library(ggdist) # rainclouds
-library(lme4)
-library(lmerTest)
-library(MuMIn) # dredge
-library(ggh4x) # facet nested wrap
-library(glmmTMB)
 
 
 ## Functions

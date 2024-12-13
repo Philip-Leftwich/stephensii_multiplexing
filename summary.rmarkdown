@@ -1,0 +1,193 @@
+---
+title: "Stephensi Multiplexing Analysis"
+author: "P Leftwich"
+format: html
+editor: visual
+---
+
+```{r}
+#| include: false
+#| label: setup
+
+knitr::opts_chunk$set(
+  comment = '#>', fig.width = 6, fig.height = 6, echo = FALSE, warning = FALSE, message = FALSE
+)
+
+library(sjPlot)
+library(gt)
+library(html2latex)
+library(viridis)
+source("scripts/cutting_analysis.R")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+#| message: false
+tab_model(mosaic_model)
+```
+
+
+
+# Homing Rates
+
+## Means and 95%CI for homing plots
+
+
+
+```{r}
+knitr::include_graphics('homing_plot.png')
+```
+
+
+
+
+## Mean values
+
+
+
+```{r}
+#| echo: false
+
+emmeans::emmeans(complex_model, specs = ~ gRNA_type*pre_cut, type = "response") %>% 
+    as_tibble() %>%   mutate(pre_cut = case_when(
+        pre_cut == "wild-type" ~ "wild-type",                          # Plain text
+        pre_cut == "cd<sup><i>225</i></sup>"      ~ "cd<sup><i>225</i></sup>",           
+        pre_cut == "cd<sup><i>384</i></sup>"    ~ "cd<sup><i>384</i></sup>"           
+    )) %>% mutate(gRNA_type = case_when(
+     gRNA_type=="cd<sup><i>g338_del</i></sup>" ~ "cd<sup><i>g338_del</i></sup>",
+     gRNA_type=="cd<sup><i>g384</i></sup>" ~ "cd<sup><i>g384</i></sup>",
+     gRNA_type=="cd<sup><i>g338-384</i></sup>" ~ "cd<sup><i>g338-384</i></sup>",
+     gRNA_type=="cd<sup><i>g225</i></sup>" ~ "cd<sup><i>g225</i></sup>")) %>%
+    mutate(across(
+      .cols = where(is.numeric),
+      .fns = ~round(.x, 2)
+    )) %>% 
+  drop_na() %>% 
+    mutate("Estimate" = paste0(prob, "<br>(",asymp.LCL,"-",asymp.UCL,")")) %>% 
+    select(-c("SE","prob", "df", "asymp.LCL", "asymp.UCL")) %>% 
+  pivot_wider(names_from = "pre_cut", values_from = "Estimate", id_cols = "gRNA_type") %>% 
+    gt::gt(
+ #     groupname_col = "gRNA_type",
+ #     rowname_col = 'pre_cut'
+    ) %>% 
+    fmt_markdown(columns = everything())  %>% 
+  cols_align(
+  align = c("center"),
+  columns = everything()
+) %>% 
+    sub_missing(
+    columns = everything(),
+    missing_text = "-"
+  ) %>% 
+ cols_label(
+    "gRNA_type" = "Transgenic",
+    "cd<sup><i>225</i></sup>" = md("cd<sup><i>225</i></sup>"),
+    "cd<sup><i>384</i></sup>" = md("cd<sup><i>384</i></sup>")
+  )
+
+```
+
+
+
+## Summary model table
+
+
+
+```{r}
+#| echo: false
+tab_model(complex_model,
+          dv.labels = "Homing Rate",
+          string.ci = "95% CI",
+          string.p = "P-Value")
+
+
+```
+
+
+
+
+## Contrasts
+
+
+
+```{r}
+#| echo: false
+
+means <- emmeans::emmeans(complex_model, specs = pairwise ~ gRNA_type*pre_cut, type = "response")
+
+means$contrasts  %>%  as_tibble() %>% drop_na() %>% 
+    mutate(contrast = paste0(contrast)) %>% 
+    mutate(across(
+      .cols = where(is.numeric),
+      .fns = ~round(.x, 2)
+    )) %>% 
+  gt::gt() %>% 
+  fmt_markdown(columns = everything()) 
+
+```
+
+
+
+
+# Meiotic Drive data
+
+
+
+```{r}
+#| include: false
+source("scripts/meiotic.R")
+```
+
+
+
+## No evidence of meitoic drive
+
+
+
+```{r}
+#| echo: false
+emmeans::emmeans(meiotic_model, specs = ~1, type = "response") %>% 
+  as_tibble() %>% 
+  drop_na %>% 
+  gt::gt()
+```
+
+```{r}
+#| echo: false
+#| eval: false
+emmeans::emmeans(meiotic_model2, specs = ~1, type = "response") %>% as_tibble() %>% drop_na %>% gt::gt()
+```
+
+
+
+# Indel formation
+
+
+
+
+```{r}
+#| include: false
+source("scripts/indel analysis.R")
+```
+
+
+
+## Frequency of missing guide sites
+
+
+
+```{r}
+knitr::include_graphics('Percentages.png')
+```
+
+
+
+## Venn diagram of missing guide sites
+
+
+
+```{r}
+knitr::include_graphics('Venn.png')
+```
+

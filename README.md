@@ -19,3 +19,16 @@ Separate multiplexing strategy:
 •	Cutting assay of the singleplex at target site A in cd, in the background of a homozygous resistance allele at target site 2 ( Crossing data summary A_1759 B_1590xD251). 
 
 Note that I cleaned all the data following the same template and all the crosses are set female:male order. Crosses that only have one direction are due to fitness cost from the Cd lines. The common direction in all the crosses is: grandmother Cas9 and father trans-het since the fitness cost mainly affects females. 
+
+
+## Indel data
+
+
+3m is a variant of sgRNA 3 with a SNP which is common in the wild type (SDA-500) (so samples lacking sgRNA3 would be those lacking this variant and exact sgRNA 3 copy) 
+4m is a variant of sgRNA 4 with a SNP which is common in the wild type (SDA-500), (so samples lacking sgRNA4 would be those lacking this variant and exact sgRNA 4 copy). 
+
+I have included the raw file used and made explanations in the file.
+
+We considered only modified reads and alleles having more than 10 reads.
+
+

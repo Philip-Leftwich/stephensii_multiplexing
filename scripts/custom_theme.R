@@ -12,7 +12,7 @@ theme_custom <- function(base_size=14, base_family="Sans"){
           panel.grid.minor = element_blank(),
           plot.background = element_rect(fill = "white",
                                           colour="white"),
-          legend.title = element_text(size=rel(1.5)),
+          legend.title = element_text(size=rel(1)),
           legend.text = element_text(color = "grey30"),
           plot.title = element_text(size = plot_title, face = "bold", hjust=0),
           plot.subtitle = element_text(size = base_size, color = "grey30"),
