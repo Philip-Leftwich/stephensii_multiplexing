@@ -88,7 +88,7 @@ Perc_bar <- data_bin %>%
   labs(x = "No. of gRNA sites lost",
        y = "Percentage of reads")
 
-ggsave("Percentages.png", dpi = 900, width = 9, height = 6, units = "in")
+ggsave("figures/Percentages.png", dpi = 900, width = 9, height = 6, units = "in")
 
 bin_model <- glm(cbind(`#Reads`, (23958 - `#Reads`)) ~ guide_1 * guide_2 * guide_3 * guide_4, family = binomial, data = data_bin)
 
@@ -150,5 +150,5 @@ ggVennDiagram(lapply(data_long, function(x) which(x == 1))) +
   scale_fill_viridis()+
   labs(fill="Read count")
 
-ggsave("Venn.png", dpi = 900, width = 9, height = 6, units = "in")
+ggsave("figures/Venn.png", dpi = 900, width = 9, height = 6, units = "in")
 
