@@ -13,7 +13,7 @@ self-contained: true
 #| label: setup
 
 knitr::opts_chunk$set(
-  comment = '#>', fig.width = 6, fig.height = 6, echo = FALSE, warning = FALSE, message = FALSE
+  comment = '#>', echo = FALSE, warning = FALSE, message = FALSE
 )
 
 library(sjPlot)
@@ -35,11 +35,18 @@ tab_model(mosaic_model)
 ## Means and 95%CI for homing plots
 
 ```{r}
-walk2(
-    list(fig_1b, fig_2c, fig_3b, fig_3d),
-    list(fig_1b_mean, fig_2c_mean, fig_3b_mean, fig_3d_mean),
-    ~ homing_plots(.x, .y)
+#| fig.asp: 0.8 
+#| fig.width: 8
+
+pwalk(
+    tibble(
+  data = list(fig_1b, fig_2c, fig_3b, fig_3d),
+  fig_mean = list(fig_1b_mean, fig_2c_mean, fig_3b_mean, fig_3d_mean),
+  colours = list(colours_fig_1b, colours_fig_2c, colours_fig_3b, colours_fig_3d)
+),
+    ~ homing_plots(..1,..2,..3)
 )
+
 ```
 
 

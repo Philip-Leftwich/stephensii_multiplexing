@@ -3,7 +3,7 @@ library(showtext)
 font_add_google("Open Sans", "Sans")
 plot.new()
 
-theme_custom <- function(base_size=14, base_family="Sans"){
+theme_custom <- function(base_size=18, base_family="Sans"){
   theme_minimal(base_size = base_size, 
                 base_family = base_family,
   ) %+replace%

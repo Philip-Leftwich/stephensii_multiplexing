@@ -71,10 +71,10 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
      filter(mosaic %in% c("yes","no"))
    
    # No significant effect of mosaicism on homing rates
-   mosaic_model <- glmmTMB(cbind(win,loss)~ cas9_parent*mosaic+(1|group_letter/id), family=binomial, data=mosaic_data)
-   summary(mosaic_model)
-   sim <- simulateResiduals(mosaic_model)
-   plot(sim, asFactor = T)
+ #  mosaic_model <- glmmTMB(cbind(win,loss)~ cas9_parent*mosaic+(1|group_letter/id), family=binomial, data=mosaic_data)
+  # summary(mosaic_model)
+  # sim <- simulateResiduals(mosaic_model)
+  # plot(sim, asFactor = T)
      
 #================================
    
@@ -97,7 +97,7 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
    
    homing_summary <- emmeans::emmeans(complex_model, specs= ~ gRNA_type*pre_cut, type="response") %>% as_tibble() 
    
-   colour <- "grey10"
+
    plot_title <- "Homing rates"
    
    custom_labels <- c(
@@ -107,6 +107,16 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
      "2273" = expression(cd^italic("g225"))
      )
    
+   `g384_del` <- "#ffc425"
+   `g338-384` <- "#A5AB81"
+   `g384` <- "#94B6D2"
+   `g225` <- "#BF9000"
+   
+   
+ colours_fig_1b <- c(`g338-384`, `g384_del`)
+ colours_fig_2c <- c(`g338-384`, `g384`)
+ colours_fig_3b <- c(`g384`)
+ colours_fig_3d <- c(`g225`)
 
    fig_1b <- complex_data %>% 
      filter(gRNA_type == "cd<sup><i>g384_del</i></sup>" | gRNA_type == "cd<sup><i>g338-384</i></sup>") %>% 
@@ -140,18 +150,20 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
      filter(gRNA_type == "cd<sup><i>g225</i></sup>") %>% 
      filter(pre_cut == "cd<sup><i>384</i></sup>" | pre_cut == "wild-type")
    
-   homing_plots <- function(.df, .means, facet = TRUE){
+   homing_plots <- function(.df, .means, .colours="grey10", facet = TRUE){
      
      homing_plot <- .df %>% 
      mutate(homing=((win/(win+loss)*100))) %>% 
-     ggplot(aes(x=gRNA_type, y=homing, group=id))+
+     ggplot(aes(x=gRNA_type, 
+                y=homing, 
+                group=id,
+                colour = gRNA_type))+
      geom_quasirandom(aes(size=win+loss), 
                       fill="white", 
                       shape = 21,
-                      alpha=0.6,
-                      colour = colour)+
-     geom_errorbar(data = .means, colour = colour, aes(min=(asymp.LCL*100), max=(asymp.UCL*100), y=prob, group=NA),width=0,  linewidth=1.2, position=position_nudge(x=0.4))+
-     geom_point(data= .means, colour = colour, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .6), .6))), size=3, position=position_nudge(x=0.4), stroke=0.6, shape = 21)+
+                      alpha=0.8)+
+     geom_errorbar(data = .means, aes(min=(asymp.LCL*100), max=(asymp.UCL*100), y=prob, group=NA),width=0,  linewidth=1.2, position=position_nudge(x=0.4))+
+     geom_point(data= .means, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .8), .2))), size=3, position=position_nudge(x=0.4), stroke=1.1, shape = 21)+
      scale_size(range=c(0,3),
                 breaks=c(50,100,150))+
      guides(fill=FALSE, colour=FALSE)+
@@ -163,6 +175,7 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
      scale_y_continuous(limits=c(10,100),
                         labels=scales::percent_format(scale=1) # automatic percentages
      )+
+     scale_colour_manual(values = .colours)+
      theme_custom()+
      theme(strip.text = element_markdown(),
            axis.text.x = element_markdown())
@@ -177,6 +190,7 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
    
 ggsave("figures/homing_plot.png", dpi = 900, width = 9, height = 6, units = "in")
    
+
    #================================
    
    # 1759 effects  
