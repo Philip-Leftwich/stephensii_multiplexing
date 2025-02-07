@@ -81,7 +81,9 @@ Perc_bar <- data_bin %>%
   summarise(reads = sum(`#Reads`)) %>% 
   mutate(perc = reads/sum(reads)) %>% 
   #  mutate(sum = fct_reorder(sum, reads)) %>% 
-  ggplot(aes(x = sum, y = perc))+geom_col()+ coord_flip()+
+  ggplot(aes(x = sum, y = perc))+
+  geom_col(fill = "lightblue", colour = "darkgrey")+ 
+  coord_flip()+
   geom_label(aes(label = scales::percent(perc)), nudge_y = .05)+
   scale_y_continuous(labels = scales::percent, limits = c(0,1))+
   theme_custom()+
@@ -139,16 +141,21 @@ weighted_correlation_matrix %>%
 
 ## Venn
 
+
+
 data_long <- data_bin %>% 
   uncount(weights = `#Reads`) %>% 
-  rename("Guide 1" = "guide_1",
-         "Guide 2"= "guide_2",
-        "Guide 3" = "guide_3",
-         "Guide 4" = "guide_4")
+  rename("sgRNA 338 \n 8578" = "guide_1",
+         "sgRNA 347 \n 4055"= "guide_2",
+        "sgRNA 362\n 4516" = "guide_3",
+         "sgRNA 384 \n 4204" = "guide_4")
 
 ggVennDiagram(lapply(data_long, function(x) which(x == 1))) + 
-  scale_fill_viridis()+
-  labs(fill="Read count")
+  scale_fill_viridis(option = "cividis")+
+  labs(fill="Read count") +
+  theme_void(base_size = 10)
 
-ggsave("figures/Venn.png", dpi = 900, width = 9, height = 6, units = "in")
+# ggVennDiagram(lapply(data_long, function(x) which(x == 1)), force_upset = T, sets.bar.color = c("lightblue", "blue", "blue", "blue"))
+
+ggsave("figures/Venn.png", dpi = 900, width = 12, height = 8, units = "in") 
 

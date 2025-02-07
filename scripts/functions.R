@@ -14,6 +14,7 @@ required <- list("tidyverse",
                 "emmeans",
                 "gt",
                 "ggVennDiagram",
+                "viridis",
                 "ggtext")
 
 lapply(required, library, character.only = T)

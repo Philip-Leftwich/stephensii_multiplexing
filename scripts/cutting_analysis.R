@@ -4,6 +4,7 @@ source("scripts/custom_theme.R")
 library(DHARMa)
 library(lmerTest)
 library(glmmTMB)
+library(brglm) # robust model for perfect convergence
 font_add_google("Open Sans", "Sans")
 
 ### homing and mosaic data
@@ -16,8 +17,13 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
   drop_na(`Female no.`)
 
 
+cut_result <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:AA300")))%>% 
+  fill(`F1 cross`) %>% 
+  drop_na(`Female no.`) %>% 
+  select(`...25`) %>%
+  rename("cleavage"=`...25`) 
 
-
+result_df <- cbind(result_df, cut_result)
   
  # Create a data frame of unique strings and assign group letters
  unique_strings <- result_df %>%
@@ -91,12 +97,49 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
    plot(sim, asFactor = T)
  
    
+   ## Cutting model
+   
+   complex_data %>% group_by(gRNA_type) %>% summarise(mean = mean((cleavage/(win+loss)), na.rm = T))
+   
+   cutting_model <- glmmTMB(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type+(1|group_letter/id), family=binomial, data=complex_data)
+   summary(cutting_model)
+   sim <- simulateResiduals(cutting_model)
+   plot(sim, asFactor = T)
+   
+   
+   ## Robust glm
+   
+   complex_data2 <- complex_data %>% 
+     mutate(gRNA_type = factor(gRNA_type, levels = c("cd<sup><i>g338-384</i></sup>",
+                                                     "cd<sup><i>g384</i></sup>",
+                                                     "cd<sup><i>g384_del</i></sup>",
+                                                     "cd<sup><i>g225</i></sup>")))
+   
+   cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=complex_data2)
+   
+   ## Means
+   emmeans::emmeans(cutting_model, specs = ~gRNA_type, type  ="response")
+   
+   emmeans::emmeans(cutting_model, specs = pairwise~gRNA_type)
+   
+   complex_data3 <- complex_data %>% 
+     mutate(gRNA_type = factor(gRNA_type, levels = c("cd<sup><i>g384</i></sup>",
+                                                     "cd<sup><i>g338-384</i></sup>",
+                                                     "cd<sup><i>g384_del</i></sup>",
+                                                     "cd<sup><i>g225</i></sup>")))
+   
+   cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=complex_data3)
 #===================================
    
   ## Figures
    
    homing_summary <- emmeans::emmeans(complex_model, specs= ~ gRNA_type*pre_cut, type="response") %>% as_tibble() 
    
+   count_data <- complex_data %>% 
+     group_by(gRNA_type, pre_cut) %>% 
+     summarise(n = n())
+   
+   homing_summary <- full_join(homing_summary, count_data, by = c("gRNA_type", "pre_cut"))
 
    plot_title <- "Homing rates"
    
@@ -164,7 +207,8 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
                       alpha=0.8)+
      geom_errorbar(data = .means, aes(min=(asymp.LCL*100), max=(asymp.UCL*100), y=prob, group=NA),width=0,  linewidth=1.2, position=position_nudge(x=0.4))+
      geom_point(data= .means, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .8), .2))), size=3, position=position_nudge(x=0.4), stroke=1.1, shape = 21)+
-     scale_size(range=c(0,3),
+     geom_label(data = .means, aes(y=105, group=NA, label = paste0("n = ",n), fill= gRNA_type), colour = "black", size=5)+
+       scale_size(range=c(0,3),
                 breaks=c(50,100,150))+
      guides(fill=FALSE, colour=FALSE)+
      labs(x="", 
@@ -172,10 +216,11 @@ result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = 
           size="Number \nof \noffspring",
           shape="")+
      scale_x_discrete()+
-     scale_y_continuous(limits=c(10,100),
+     scale_y_continuous(limits=c(10,108),
                         labels=scales::percent_format(scale=1) # automatic percentages
      )+
      scale_colour_manual(values = .colours)+
+    scale_fill_manual(values = after_scale(desaturate(lighten(.colours, .8), .2)))+
      theme_custom()+
      theme(strip.text = element_markdown(),
            axis.text.x = element_markdown())

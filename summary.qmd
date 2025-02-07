@@ -36,7 +36,7 @@ tab_model(mosaic_model)
 
 ```{r}
 #| fig.asp: 0.8 
-#| fig.width: 8
+#| fig.width: 6
 
 pwalk(
     tibble(
