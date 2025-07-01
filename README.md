@@ -25,7 +25,7 @@ This repository contains all data, R scripts, and supplementary materials for ou
 ```text
 .
 ├── data/             # Raw and processed data files
-├── scripts/          # R scripts for analysis and modeling
+├── scripts/          # R scripts for analysis and modeling and CRISPRESSO bash script
 ├── figures/          # Output figures and plots
 ├── renv/             # renv environment folder
 ├── renv.lock         # Lockfile for R package versions
@@ -63,9 +63,10 @@ This repository contains all data, R scripts, and supplementary materials for ou
 1. **Data:**  
    - All raw and processed datasets are in the `data/` directory.
 
-2. **Analysis & Modeling:**  
+2. **Scripts:**  
    - Open the relevant R scripts in the `scripts/` directory.
    - Each script includes comments and instructions for reproducing analyses and generating figures.
+   - Automated CRISPResso2 Pipeline Install [CRISPResso2](https://crispresso.pinellolab.partners.org/) and its dependencies.
 
 3. **Figures:**  
    - Output figures are saved in the `figures/` directory after running scripts.
