@@ -1,11 +1,8 @@
 source("scripts/functions.R")
 source("scripts/custom_theme.R")
-library(DHARMa)
-library(lmerTest)
-library(glmmTMB)
-font_add_google("Open Sans", "Sans")
 
-### meiotic driver
+
+# Read in data to check for meiotic drive====
 
 file_paths <- list.files(path="./data/meiotic", pattern = "*.xlsx", full.names = T) 
 sheet_nums <- c(2,3)
@@ -13,8 +10,8 @@ sheet_nums <- c(2,3)
 meiotic_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:L32")))
 
 
-####
-# cdg338-384
+
+# cdg338-384====
 df_2301 <- meiotic_df %>% 
   filter(filename == "./data/meiotic/Crossing data summary A2301 B_1590 M_1928B12 x QA383P - CLEAN.xlsx") %>% 
   mutate(win = (ABM+AM),
@@ -29,8 +26,7 @@ emmeans::emmeans(meiotic_model, specs = ~1, type = "response")
 
 
 
-####
-# cdg384
+# cdg384====
 df_1759 <- meiotic_df %>% 
   filter(filename == "./data/meiotic/Crossing data summary A_1759 B_1590 Marker_1928B12 - CLEAN.xlsx") %>% 
   drop_na(`A`) %>% 
@@ -42,11 +38,11 @@ df_1759 <- meiotic_df %>%
   emmeans::emmeans(meiotic_model2, specs = ~1, type = "response") 
   
   
-### Overall model 
+# Overall model====
   
   meiotic_df <- meiotic_df %>% drop_na(`A`) %>% 
-    mutate(win = (ABM+AM),
-           loss = (AB+A)) %>% 
+    mutate(win = (ABM+AM+BM+M),
+           loss = (AB+A+B+WT)) %>% 
     mutate(
       `gRNA_type` = if_else(
         str_detect(filename, "2301"),
@@ -59,5 +55,9 @@ df_1759 <- meiotic_df %>%
   
   meiotic_model3 <- glm(cbind(win,loss)~ `gRNA_type`, family=binomial, data=meiotic_df)
   
+  homing_model <- glm(cbind(A+AB+ABM+AM,BM+B+M+WT)~ `gRNA_type`, family=binomial, data=meiotic_df)
+  
   emmeans::emmeans(meiotic_model3, specs = ~ `gRNA_type`, type = "response") 
+  
+  emmeans::emmeans(homing_model, specs = ~ `gRNA_type`, type = "response") 
   

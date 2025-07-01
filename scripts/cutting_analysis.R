@@ -1,13 +1,9 @@
 
-source("scripts/functions.R")
-source("scripts/custom_theme.R")
-library(DHARMa)
-library(lmerTest)
-library(glmmTMB)
-library(brglm) # robust model for perfect convergence
-font_add_google("Open Sans", "Sans")
 
-### homing and mosaic data
+source("scripts/custom_theme.R")
+source("scripts/functions.R")
+
+# homing and mosaic data read-in====
 
 file_paths <- list.files(path="./data/", pattern = "*.xlsx", full.names = T) 
 sheet_nums <- c(3,2,2,3,3,3,2,2)
@@ -15,7 +11,6 @@ sheet_nums <- c(3,2,2,3,3,3,2,2)
 result_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:I300")))%>% 
     fill(`F1 cross`) %>% 
   drop_na(`Female no.`)
-
 
 cut_result <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:AA300")))%>% 
   fill(`F1 cross`) %>% 
@@ -25,12 +20,12 @@ cut_result <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range =
 
 result_df <- cbind(result_df, cut_result)
   
- # Create a data frame of unique strings and assign group letters
+# Create a data frame of unique strings and assign group letters
  unique_strings <- result_df %>%
       distinct(`F1 cross`) %>%
        mutate(group_letter = letters[1:n()])
 
-   # Merge the original data frame with the unique strings data frame
+# Merge the original data frame with the unique strings data frame
    new <- result_df %>%
        left_join(unique_strings, by = "F1 cross")
    
@@ -63,12 +58,11 @@ result_df <- cbind(result_df, cut_result)
        gRNA_type=="2072" ~ "cd<sup><i>g384_del</i></sup>",
        gRNA_type=="1759" ~ "cd<sup><i>g384</i></sup>",
        gRNA_type=="2301" ~ "cd<sup><i>g338-384</i></sup>",
-       gRNA_type=="2273" ~ "cd<sup><i>g225</i></sup>")) 
+       gRNA_type=="2273" ~ "cd<sup><i>g225</i></sup>")) %>% 
+     mutate(cleavage = if_else(gRNA_type_original == "2273", cleavage + win, cleavage)) # 2273 has cd recoding
   
 
 
-
-   
 #=======================
    
   # Mosaicism vs Dark eyes
@@ -76,21 +70,14 @@ result_df <- cbind(result_df, cut_result)
    mosaic_data <- homing_data %>% 
      filter(mosaic %in% c("yes","no"))
    
-   # No significant effect of mosaicism on homing rates
- #  mosaic_model <- glmmTMB(cbind(win,loss)~ cas9_parent*mosaic+(1|group_letter/id), family=binomial, data=mosaic_data)
-  # summary(mosaic_model)
-  # sim <- simulateResiduals(mosaic_model)
-  # plot(sim, asFactor = T)
-     
+
 #================================
    
    # Different sgRNAs
    
    complex_data <- homing_data %>% 
      filter(cas9_parent == "Male") 
- #    filter(!(gRNA_type == "1759" & pre_cut == "QA383P")) %>% 
-#    filter(pre_cut != "D251")
-   
+
    complex_model <- glmmTMB(cbind(win,loss)~ gRNA_type*pre_cut+(1|group_letter/id), family=binomial, data=complex_data)
    summary(complex_model)
    sim <- simulateResiduals(complex_model)
@@ -120,7 +107,7 @@ result_df <- cbind(result_df, cut_result)
    ## Means
    emmeans::emmeans(cutting_model, specs = ~gRNA_type, type  ="response")
    
-   emmeans::emmeans(cutting_model, specs = pairwise~gRNA_type)
+   emmeans::emmeans(cutting_model, specs = pairwise~gRNA_type, adjust = "none")
    
    complex_data3 <- complex_data %>% 
      mutate(gRNA_type = factor(gRNA_type, levels = c("cd<sup><i>g384</i></sup>",
@@ -150,7 +137,7 @@ result_df <- cbind(result_df, cut_result)
      "2273" = expression(cd^italic("g225"))
      )
    
-   `g384_del` <- "#ffc425"
+   `g384_del` <- "#fcb001"
    `g338-384` <- "#A5AB81"
    `g384` <- "#94B6D2"
    `g225` <- "#BF9000"
@@ -193,46 +180,7 @@ result_df <- cbind(result_df, cut_result)
      filter(gRNA_type == "cd<sup><i>g225</i></sup>") %>% 
      filter(pre_cut == "cd<sup><i>384</i></sup>" | pre_cut == "wild-type")
    
-   homing_plots <- function(.df, .means, .colours="grey10", facet = TRUE){
-     
-     homing_plot <- .df %>% 
-     mutate(homing=((win/(win+loss)*100))) %>% 
-     ggplot(aes(x=gRNA_type, 
-                y=homing, 
-                group=id,
-                colour = gRNA_type))+
-     geom_quasirandom(aes(size=win+loss), 
-                      fill="white", 
-                      shape = 21,
-                      alpha=0.8)+
-     geom_errorbar(data = .means, aes(min=(asymp.LCL*100), max=(asymp.UCL*100), y=prob, group=NA),width=0,  linewidth=1.2, position=position_nudge(x=0.4))+
-     geom_point(data= .means, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .8), .2))), size=3, position=position_nudge(x=0.4), stroke=1.1, shape = 21)+
-     geom_label(data = .means, aes(y=105, group=NA, label = paste0("n = ",n), fill= gRNA_type), colour = "black", size=5)+
-       scale_size(range=c(0,3),
-                breaks=c(50,100,150))+
-     guides(fill=FALSE, colour=FALSE)+
-     labs(x="", 
-          y="Percentage of individuals scored",
-          size="Number \nof \noffspring",
-          shape="")+
-     scale_x_discrete()+
-     scale_y_continuous(limits=c(10,108),
-                        labels=scales::percent_format(scale=1) # automatic percentages
-     )+
-     scale_colour_manual(values = .colours)+
-    scale_fill_manual(values = after_scale(desaturate(lighten(.colours, .8), .2)))+
-     theme_custom()+
-     theme(strip.text = element_markdown(),
-           axis.text.x = element_markdown())
-     
-     
-     if(facet == TRUE){
-       homing_plot <- homing_plot+
-        facet_wrap(~ pre_cut, scales = "free")
-     }
-     print(homing_plot)
-   }
-   
+
 ggsave("figures/homing_plot.png", dpi = 900, width = 9, height = 6, units = "in")
    
 
