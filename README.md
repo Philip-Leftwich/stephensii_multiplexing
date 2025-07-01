@@ -1,34 +1,92 @@
-# stephensii_multiplexing
+# Integrating multiplexing into confineable gene drives effectively overrides resistance in Anopheles stephensi
 
-- 1590 = Cas9 (B element)
+**Authors:**  
+Mireia Larrosa Godall¹³⁴, Lewis Shackleford¹²³, Matthew P. Edgington¹²³, Philip T. Leftwich⁵, James C. Y. Luk¹², Joshua Southworth³, Stewart Rosell³, Jake Creasey¹², Jack Aked¹², Katherine Nevard³, Alexander Dodds¹², Morgan Mckee¹², Eunice Adedeji¹², Estela Gonzalez³⁶, Joshua X.D. Ang¹²³, Michelle A. E. Anderson¹²³, Luke Alphey¹²³
 
-- A = gRNA elements
+- ¹ Department of Biology, University of York, UK  
+- ² York Biomedical Research Institute, University of York, UK  
+- ³ Arthropod Genetics, The Pirbright Institute, UK  
+- ⁴ The Francis Crick Institute, UK  
+- ⁵ School of Biological Sciences, University of East Anglia, UK  
+- ⁶ Animal and Plant Health Agency, UK  
 
-Classing multiplexing strategy
+**Keywords:** mosquito, CRISPR-Cas9, malaria
 
-•	Cutting assay of the singleplex at target site A in Cd (Crossing data summary A1759 B_1590): you might have seen this data before for the PolII promoters. However I think it is important to say that I changed the order of the crosses to female:male to match the rest of the crosses. 
-•	Cutting assay of the singleplex deletion at target site A in Cd ( Crossing data summary A_2072 B_1590)
-•	Cutting assay of the multiplex deletion at target site A in Cd with 3 additional sgRNAs ( Crossing data summary A_2301 B_1590). 
-•	Cutting assay of the singleplex at target site A in Cd in background of a homozygous resistance allele at target site A (Crossing data summary A_1759 B_1590xQA383P): resistance is at the sgRNA 1 target site so no cutting should occur. 
-•	Cutting assay of the multiplex deletion at target site A in Cd with 3 additional sgRNAs in background of a homozygous resistance allele at target site A (Crossing data summary A_2301 B_1590xQA383P):  resistance is at the sgRNA 1 target site so cutting should be due to the 3 additional gRNAs (which were not individually tested). 
+---
 
-Separate multiplexing strategy: 
-•	Cutting assay of the singleplex at target site B in cd ( Crossing data summary A_2273 B_1590): I am not sure if it is relevant but this singleplex line was a rescue in comparison to the others. 
-•	Cutting assay of the singleplex at target site B in cd, in the background of a homozygous resistance allele at target site A ( Crossing data summary A_2273 B_1590xQA383P).
-•	Cutting assay of singleplex at target site A in cd ( Crossing data summary A_1759 B_1590): is the same cross used for the classign multiplexing strategy. 
-•	Cutting assay of the singleplex at target site A in cd, in the background of a homozygous resistance allele at target site 2 ( Crossing data summary A_1759 B_1590xD251). 
+## Summary
 
-Note that I cleaned all the data following the same template and all the crosses are set female:male order. Crosses that only have one direction are due to fitness cost from the Cd lines. The common direction in all the crosses is: grandmother Cas9 and father trans-het since the fitness cost mainly affects females. 
+This repository contains all data, R scripts, and supplementary materials for our study on multiplexed CRISPR/Cas9 gene drives in Anopheles stephensi. Our research demonstrates that multiplexing with multiple sgRNAs can overcome resistance at the target site, a major challenge in gene drive deployment. We provide both experimental data and modeling results to support our findings. All analyses are reproducible using the included code and environment management via `renv`.
 
+---
 
-## Indel data
+## Repository Structure
 
+```text
+.
+├── data/             # Raw and processed data files
+├── scripts/          # R scripts for analysis and modeling
+├── figures/          # Output figures and plots
+├── renv/             # renv environment folder
+├── renv.lock         # Lockfile for R package versions
+└── README.md         # This file
+```
 
-3m is a variant of sgRNA 3 with a SNP which is common in the wild type (SDA-500) (so samples lacking sgRNA3 would be those lacking this variant and exact sgRNA 3 copy) 
-4m is a variant of sgRNA 4 with a SNP which is common in the wild type (SDA-500), (so samples lacking sgRNA4 would be those lacking this variant and exact sgRNA 4 copy). 
+---
 
-I have included the raw file used and made explanations in the file.
+## Getting Started
 
-We considered only modified reads and alleles having more than 10 reads.
+### Prerequisites
 
+- [R](https://www.r-project.org/) (version 4.0 or higher recommended)
+- [renv](https://rstudio.github.io/renv/) (for R package and environment management)
 
+### Installation
+
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/Philip-Leftwich/stephensii_multiplexing.git
+   cd stephensii_multiplexing
+   ```
+
+2. **Restore the project environment using renv:**
+   Open R or RStudio in the project directory and run:
+   ```r
+   renv::restore()
+   ```
+   This will install all required packages as specified in `renv.lock`.
+
+---
+
+## Usage
+
+1. **Data:**  
+   - All raw and processed datasets are in the `data/` directory.
+
+2. **Analysis & Modeling:**  
+   - Open the relevant R scripts in the `scripts/` directory.
+   - Each script includes comments and instructions for reproducing analyses and generating figures.
+
+3. **Figures:**  
+   - Output figures are saved in the `figures/` directory after running scripts.
+
+---
+
+## License
+
+This repository is licensed under the [MIT License](./LICENSE).
+
+---
+
+## Contact
+
+For questions, please contact:  
+- michelle.anderson@york.ac.uk  
+- luke.alphey@york.ac.uk
+- p.leftwich@uea.ac.uk 
+
+---
+
+## Acknowledgements
+
+This project was supported by the University of York, The Pirbright Institute, and collaborators as detailed above.
