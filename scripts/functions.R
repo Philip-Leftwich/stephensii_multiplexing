@@ -15,7 +15,8 @@ required <- list("tidyverse",
                 "viridis",
                 "ggtext",
                 "DHARMa",
-                "ggcorrplot")
+                "ggcorrplot",
+                "showtext")
 
 lapply(required, library, character.only = T)
 
@@ -74,9 +75,11 @@ homing_plots <- function(.df, .means, .colours="grey10", facet = TRUE){
     geom_quasirandom(aes(size=win+loss), 
                      fill="white", 
                      shape = 21,
-                     alpha=0.8)+
+                     alpha=0.8,
+                     width = .3,
+                     stroke = 1.1)+
     geom_errorbar(data = .means, aes(min=(asymp.LCL*100), max=(asymp.UCL*100), y=prob, group=NA),width=0,  linewidth=1.2, position=position_nudge(x=0.4))+
-    geom_point(data= .means, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .4), 0.1))), size=3, position=position_nudge(x=0.4), stroke=1.1, shape = 21)+
+    geom_point(data= .means, aes(y=prob*100, group=NA, fill=after_scale(desaturate(lighten(colour, .4), 0.1))), size=3.5, position=position_nudge(x=0.4), stroke=1.1, shape = 21)+
     geom_label(data = .means, aes(y=115, group=NA, label = paste0("n = ",n), fill= gRNA_type), colour = "black", size=5)+
     scale_size(range=c(0,3),
                breaks=c(50,100,150))+

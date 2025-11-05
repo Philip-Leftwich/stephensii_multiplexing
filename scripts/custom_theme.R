@@ -9,6 +9,7 @@ theme_custom <- function(base_size=18, base_family="Sans"){
     theme(axis.ticks = element_line(color = "grey92"),
           axis.ticks.length = unit(.5, "lines"),
           panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_line(linewidth = .8),
           plot.background = element_rect(fill = "white",
                                           colour="white"),
           legend.title = element_text(size=rel(1)),

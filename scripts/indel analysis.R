@@ -84,7 +84,7 @@ ggVennDiagram(lapply(data_long, function(x) which(x == 1))) +
   labs(fill="Read count") +
   theme_void(base_size = 10)
 
-# ggVennDiagram(lapply(data_long, function(x) which(x == 1)), force_upset = T, sets.bar.color = c("lightblue", "blue", "blue", "blue"))
+ggVennDiagram(lapply(data_long, function(x) which(x == 1)), force_upset = T)
 
 ggsave("figures/Venn.png", dpi = 900, width = 12, height = 8, units = "in") 
 

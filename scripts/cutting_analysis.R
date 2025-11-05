@@ -94,28 +94,7 @@ result_df <- cbind(result_df, cut_result)
    plot(sim, asFactor = T)
    
    
-   ## Robust glm
-   
-   complex_data2 <- complex_data %>% 
-     mutate(gRNA_type = factor(gRNA_type, levels = c("cd<sup><i>g338-384</i></sup>",
-                                                     "cd<sup><i>g384</i></sup>",
-                                                     "cd<sup><i>g384_del</i></sup>",
-                                                     "cd<sup><i>g225</i></sup>")))
-   
-   cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=complex_data2)
-   
-   ## Means
-   emmeans::emmeans(cutting_model, specs = ~gRNA_type, type  ="response")
-   
-   emmeans::emmeans(cutting_model, specs = pairwise~gRNA_type, adjust = "none")
-   
-   complex_data3 <- complex_data %>% 
-     mutate(gRNA_type = factor(gRNA_type, levels = c("cd<sup><i>g384</i></sup>",
-                                                     "cd<sup><i>g338-384</i></sup>",
-                                                     "cd<sup><i>g384_del</i></sup>",
-                                                     "cd<sup><i>g225</i></sup>")))
-   
-   cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=complex_data3)
+
 #===================================
    
   ## Figures
@@ -138,9 +117,9 @@ result_df <- cbind(result_df, cut_result)
      )
    
    `g384_del` <- "#fcb001"
-   `g338-384` <- "#A5AB81"
-   `g384` <- "#94B6D2"
-   `g225` <- "#BF9000"
+   `g338-384` <- "#A1AA11"
+   `g384` <- "#91A6D2"
+   `g225` <- "#BF9900"
    
    
  colours_fig_1b <- c(`g338-384`, `g384_del`)
