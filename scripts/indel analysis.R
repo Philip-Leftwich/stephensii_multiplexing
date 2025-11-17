@@ -79,12 +79,14 @@ data_long <- data %>%
 
 indices_list <- lapply(data_long, function(x) which(x == 1))
 
-ggVennDiagram(lapply(data_long, function(x) which(x == 1))) + 
+
+
+ggVennDiagram(indices_list) + 
   scale_fill_viridis(option = "cividis")+
   labs(fill="Read count") +
   theme_void(base_size = 10)
 
-ggVennDiagram(lapply(data_long, function(x) which(x == 1)), force_upset = T)
+plot_upset(Venn(rev(indices_list)), sets.bar.x.label = "Total Modified Reads\n lacking sgRNA", top.bar.y.label = "Number of Modified Reads")
 
 ggsave("figures/Venn.png", dpi = 900, width = 12, height = 8, units = "in") 
 

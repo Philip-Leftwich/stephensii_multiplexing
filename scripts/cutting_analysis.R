@@ -1,5 +1,5 @@
 
-
+## Functions ====
 source("scripts/custom_theme.R")
 source("scripts/functions.R")
 
@@ -65,7 +65,7 @@ result_df <- cbind(result_df, cut_result)
 
 #=======================
    
-  # Mosaicism vs Dark eyes
+  # Mosaicism vs Dark eyes ====
    
    mosaic_data <- homing_data %>% 
      filter(mosaic %in% c("yes","no"))
@@ -73,7 +73,7 @@ result_df <- cbind(result_df, cut_result)
 
 #================================
    
-   # Different sgRNAs
+   # Homing model ====
    
    complex_data <- homing_data %>% 
      filter(cas9_parent == "Male") 
@@ -84,20 +84,10 @@ result_df <- cbind(result_df, cut_result)
    plot(sim, asFactor = T)
  
    
-   ## Cutting model
-   
-   complex_data %>% group_by(gRNA_type) %>% summarise(mean = mean((cleavage/(win+loss)), na.rm = T))
-   
-   cutting_model <- glmmTMB(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type+(1|group_letter/id), family=binomial, data=complex_data)
-   summary(cutting_model)
-   sim <- simulateResiduals(cutting_model)
-   plot(sim, asFactor = T)
-   
-   
 
 #===================================
    
-  ## Figures
+  ## Figures ====
    
    homing_summary <- emmeans::emmeans(complex_model, specs= ~ gRNA_type*pre_cut, type="response") %>% as_tibble() 
    
@@ -163,13 +153,20 @@ result_df <- cbind(result_df, cut_result)
 ggsave("figures/homing_plot.png", dpi = 900, width = 9, height = 6, units = "in")
    
 
-   #================================
-   
-   # 1759 effects  
-   
-   data_1759 <- homing_data %>% 
-     filter(cas9_parent == "Male") %>% 
-     filter(gRNA_type == "1759") 
+# Cutting model ====
+
+complex_data %>% group_by(gRNA_type) %>% summarise(mean = mean((cleavage/(win+loss)), na.rm = T))
+
+cutting_model <- glmmTMB(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type+(1|group_letter/id), family=binomial, data=complex_data)
+summary(cutting_model)
+sim <- simulateResiduals(cutting_model)
+plot(sim, asFactor = T)
+
+## Robust model ====
+# Wide confidence intervals for 338-384
+robust_cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=complex_data)
+means <- emmeans::emmeans(robust_cutting_model, specs = ~ gRNA_type)
+pairs(means)
    
 
 
