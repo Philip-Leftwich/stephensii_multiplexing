@@ -27,25 +27,29 @@ font_add_google("Open Sans", "Sans")
 
 ## Functions
 
+## Read plus====
 read_plus <- function(flnm, sheet, skip, range) {
   read_excel(flnm ,sheet=sheet, skip=skip, na=c("na","NA", "-"), range = range) %>% 
     mutate(filename = flnm)
   
 }
 
-#####
 
-##### force bind, bind rows of data when column names do not match #####
 
-force_bind = function(df1, df2) {
+## force bind ====
+
+### bind rows of data when column names do not match #####
+
+force_bind <-  function(df1, df2) {
   colnames(df2) = colnames(df1)
   bind_rows(df1, df2)
 }
 
-#####
 
 
-##### DHARMa_check function to simulate residuals and plot - for mixed models
+
+## DHARMa_check ====
+# function to simulate residuals and plot - for mixed models
 
 DHARMa_check <- function(model){
   sim <- DHARMa::simulateResiduals(model) 
@@ -53,7 +57,8 @@ DHARMa_check <- function(model){
 }
 
 
-##### binned plot to check overdispersion in binomial model
+## bin_plot ====
+# to check overdispersion in binomial model
 
 bin_plot <- function(model){
 x <- predict(model)
@@ -62,7 +67,7 @@ arm::binnedplot(x,y)
 }
 
 
-### Homing plots
+## Homing plots ====
 
 homing_plots <- function(.df, .means, .colours="grey10", facet = TRUE){
   

@@ -10,20 +10,18 @@ sheet_nums <- c(2,3)
 meiotic_df <- map2_df(file_paths, sheet_nums, ~read_plus(.x, sheet = .y, range = ("C4:L32")))
 
 
-
 # cdg338-384====
 df_2301 <- meiotic_df %>% 
   filter(filename == "./data/meiotic/Crossing data summary A2301 B_1590 M_1928B12 x QA383P - CLEAN.xlsx") %>% 
   mutate(win = (ABM+AM),
        loss = (AB+A)) 
 
-meiotic_model <- glmmTMB(cbind(win,loss)~ 1+(1|`Female no.`), family=binomial, data=df_2301)
+meiotic_model_2301 <- glmmTMB(cbind(win,loss)~ 1+(1|`Female no.`), family=binomial, data=df_2301)
 
 sim <- simulateResiduals(meiotic_model)
 plot(sim, asFactor = T)
 
 emmeans::emmeans(meiotic_model, specs = ~1, type = "response") 
-
 
 
 # cdg384====
@@ -33,7 +31,7 @@ df_1759 <- meiotic_df %>%
   mutate(win = (ABM+AM),
          loss = (AB+A)) 
   
-  meiotic_model2 <- glm(cbind(win,loss)~ 1, family=binomial, data=df_1759)
+  meiotic_model_1759 <- glm(cbind(win,loss)~ 1, family=binomial, data=df_1759)
 
   emmeans::emmeans(meiotic_model2, specs = ~1, type = "response") 
   
@@ -53,11 +51,11 @@ df_1759 <- meiotic_df %>%
     mutate(filename = factor(`gRNA_type`)) %>% 
     mutate(filename = fct_rev(`gRNA_type`))
   
-  meiotic_model3 <- glm(cbind(win,loss)~ `gRNA_type`, family=binomial, data=meiotic_df)
+  meiotic_model <- glm(cbind(win,loss)~ `gRNA_type`, family=binomial, data=meiotic_df)
   
   homing_model <- glm(cbind(A+AB+ABM+AM,BM+B+M+WT)~ `gRNA_type`, family=binomial, data=meiotic_df)
   
-  emmeans::emmeans(meiotic_model3, specs = ~ `gRNA_type`, type = "response") 
+  emmeans::emmeans(meiotic_model, specs = ~ `gRNA_type`, type = "response") 
   
   emmeans::emmeans(homing_model, specs = ~ `gRNA_type`, type = "response") 
   

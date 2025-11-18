@@ -3,7 +3,6 @@ source("scripts/functions.R")
 source("scripts/custom_theme.R")
 
 
-
 # Read in data====
 
 files <- list.files(path = "data/indels", pattern = "\\.xlsx$", full.names = TRUE)
@@ -80,11 +79,14 @@ data_long <- data %>%
 indices_list <- lapply(data_long, function(x) which(x == 1))
 
 
-
-ggVennDiagram(indices_list) + 
+## Venn diagram ====
+ggVennDiagram(indices_list, label_alpha = 1, label_color = "white") + 
   scale_fill_viridis(option = "cividis")+
   labs(fill="Read count") +
   theme_void(base_size = 10)
+
+
+# Upset plot====
 
 plot_upset(Venn(rev(indices_list)), sets.bar.x.label = "Total Modified Reads\n lacking sgRNA", top.bar.y.label = "Number of Modified Reads")
 

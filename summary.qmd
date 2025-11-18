@@ -22,13 +22,6 @@ library(viridis)
 source("scripts/cutting_analysis.R")
 ```
 
-```{r}
-#| echo: false
-#| eval: false
-#| message: false
-tab_model(mosaic_model)
-```
-
 # Homing Rates
 
 ## Means and 95%CI for homing plots
@@ -54,7 +47,7 @@ pwalk(
 ```{r}
 #| echo: false
 
-emmeans::emmeans(complex_model, specs = ~ gRNA_type*pre_cut, type = "response") %>% 
+emmeans::emmeans(homing_model, specs = ~ gRNA_type*pre_cut, type = "response") %>% 
     as_tibble() %>%   mutate(pre_cut = case_when(
         pre_cut == "wild-type" ~ "wild-type",                          # Plain text
         pre_cut == "cd<sup><i>225</i></sup>"      ~ "cd<sup><i>225</i></sup>",           
@@ -97,7 +90,7 @@ emmeans::emmeans(complex_model, specs = ~ gRNA_type*pre_cut, type = "response") 
 
 ```{r}
 #| echo: false
-tab_model(complex_model,
+tab_model(homing_model,
           dv.labels = "Homing Rate",
           string.ci = "95% CI",
           string.p = "P-Value")
@@ -111,7 +104,7 @@ tab_model(complex_model,
 ```{r}
 #| echo: false
 
-means <- emmeans::emmeans(complex_model, specs = pairwise ~ gRNA_type*pre_cut, 
+means <- emmeans::emmeans(homing_model, specs = pairwise ~ gRNA_type*pre_cut, 
                           type = "response",
                           adjust = "none")
 
@@ -136,7 +129,7 @@ source("scripts/meiotic.R")
 
 ```{r}
 
-tab_model(meiotic_model3,
+tab_model(meiotic_model,
           dv.labels = "Meiotic Drive",
           string.ci = "95% CI",
           string.p = "P-Value")
@@ -146,7 +139,7 @@ tab_model(meiotic_model3,
 
 ```{r}
 
-emmeans::emmeans(meiotic_model3, specs = ~ gRNA_type, type = "response") %>% 
+emmeans::emmeans(meiotic_model, specs = ~ gRNA_type, type = "response") %>% 
     as_tibble() %>% 
   mutate(gRNA_type = case_when(
      gRNA_type=="cd<sup><i>g384</i></sup>" ~ "cd<sup><i>g384</i></sup>",
