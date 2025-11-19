@@ -53,9 +53,9 @@ df_1759 <- meiotic_df %>%
   
   meiotic_model <- glm(cbind(win,loss)~ `gRNA_type`, family=binomial, data=meiotic_df)
   
-  homing_model <- glm(cbind(A+AB+ABM+AM,BM+B+M+WT)~ `gRNA_type`, family=binomial, data=meiotic_df)
+  homing_model_meiotic_expt <- glm(cbind(A+AB+ABM+AM,BM+B+M+WT)~ `gRNA_type`, family=binomial, data=meiotic_df)
   
   emmeans::emmeans(meiotic_model, specs = ~ `gRNA_type`, type = "response") 
   
-  emmeans::emmeans(homing_model, specs = ~ `gRNA_type`, type = "response") 
+  emmeans::emmeans(homing_model_meiotic_expt, specs = ~ `gRNA_type`, type = "response") 
   

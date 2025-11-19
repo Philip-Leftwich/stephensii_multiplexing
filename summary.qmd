@@ -123,6 +123,8 @@ means$contrasts  %>%  as_tibble() %>% drop_na() %>%
 source("scripts/meiotic.R")
 ```
 
+## Meitoic drive analysis
+
 ```{r}
 
 tab_model(meiotic_model,
@@ -131,6 +133,43 @@ tab_model(meiotic_model,
           string.p = "P-Value")
 
 ```
+
+## Meiotic experiment homing rates
+
+```{r}
+
+emmeans::emmeans(homing_model_meiotic_expt, specs = ~ gRNA_type, type = "response") %>% 
+    as_tibble() %>% 
+  mutate(gRNA_type = case_when(
+     gRNA_type=="cd<sup><i>g384</i></sup>" ~ "cd<sup><i>g384</i></sup>",
+     gRNA_type=="cd<sup><i>g338-384</i></sup>" ~ "cd<sup><i>g338-384</i></sup>"
+  )) %>% 
+    mutate(across(
+      .cols = where(is.numeric),
+      .fns = ~round(.x, 2)
+    )) %>% 
+  drop_na() %>% 
+    mutate("Estimate" = paste0(prob, "<br>(",asymp.LCL,"-",asymp.UCL,")")) %>% 
+    select(-c("SE","prob", "df", "asymp.LCL", "asymp.UCL")) %>% 
+    gt::gt(
+    ) %>% 
+    fmt_markdown(columns = everything())  %>% 
+  cols_align(
+  align = c("center"),
+  columns = everything()
+) %>% 
+    sub_missing(
+    columns = everything(),
+    missing_text = "-"
+  ) %>% 
+ cols_label(
+    "gRNA_type" = "Transgenic"
+  )
+
+```
+
+
+## Linked allele inheritance rates
 
 ```{r}
 

@@ -39,6 +39,9 @@ plot(sim, asFactor = T)
 ##  Robust model ====
 # Wide confidence intervals for 338-384 due to complete homing rate
 robust_cutting_model <- brglm(cbind(cleavage,((win+loss)-cleavage))~ gRNA_type, family=binomial, data=homing_data)
+
+emmeans::emmeans(robust_cutting_model, specs = ~ gRNA_type, type = "response")
+
 means <- emmeans::emmeans(robust_cutting_model, specs = ~ gRNA_type)
 pairs(means)
    
