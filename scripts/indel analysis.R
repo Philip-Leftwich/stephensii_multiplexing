@@ -80,15 +80,17 @@ indices_list <- lapply(data_long, function(x) which(x == 1))
 
 
 ## Venn diagram ====
-ggVennDiagram(indices_list, label_alpha = 1, label_color = "white") + 
+ggVennDiagram(indices_list) + 
   scale_fill_viridis(option = "cividis")+
   labs(fill="Read count") +
   theme_void(base_size = 10)
+
+ggsave("figures/Venn.png", dpi = 900, width = 12, height = 8, units = "in") 
 
 
 # Upset plot====
 
 plot_upset(Venn(rev(indices_list)), sets.bar.x.label = "Total Modified Reads\n lacking sgRNA", top.bar.y.label = "Number of Modified Reads")
 
-ggsave("figures/Venn.png", dpi = 900, width = 12, height = 8, units = "in") 
+ggsave("figures/Upset.png", dpi = 900, width = 12, height = 8, units = "in") 
 

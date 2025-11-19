@@ -18,10 +18,10 @@ df_2301 <- meiotic_df %>%
 
 meiotic_model_2301 <- glmmTMB(cbind(win,loss)~ 1+(1|`Female no.`), family=binomial, data=df_2301)
 
-sim <- simulateResiduals(meiotic_model)
+sim <- simulateResiduals(meiotic_model_2301)
 plot(sim, asFactor = T)
 
-emmeans::emmeans(meiotic_model, specs = ~1, type = "response") 
+emmeans::emmeans(meiotic_model_2301, specs = ~1, type = "response") 
 
 
 # cdg384====
@@ -33,7 +33,7 @@ df_1759 <- meiotic_df %>%
   
   meiotic_model_1759 <- glm(cbind(win,loss)~ 1, family=binomial, data=df_1759)
 
-  emmeans::emmeans(meiotic_model2, specs = ~1, type = "response") 
+  emmeans::emmeans(meiotic_model_1759, specs = ~1, type = "response") 
   
   
 # Overall model====

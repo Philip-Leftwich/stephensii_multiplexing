@@ -6,7 +6,6 @@ editor: visual
 self-contained: true
 ---
 
-
 ```{r}
 #| include: false
 #| label: setup
@@ -19,7 +18,7 @@ library(sjPlot)
 library(gt)
 library(html2latex)
 library(viridis)
-source("scripts/cutting_analysis.R")
+source("scripts/homing_figures.R")
 ```
 
 # Homing Rates
@@ -40,7 +39,6 @@ pwalk(
 )
 
 ```
-
 
 ## Mean values
 
@@ -98,7 +96,6 @@ tab_model(homing_model,
 
 ```
 
-
 ## Contrasts
 
 ```{r}
@@ -119,7 +116,6 @@ means$contrasts  %>%  as_tibble() %>% drop_na() %>%
 
 ```
 
-
 # Meiotic Drive data
 
 ```{r}
@@ -135,7 +131,6 @@ tab_model(meiotic_model,
           string.p = "P-Value")
 
 ```
-
 
 ```{r}
 
@@ -169,9 +164,7 @@ emmeans::emmeans(meiotic_model, specs = ~ gRNA_type, type = "response") %>%
 
 ```
 
-
 # Indel formation
-
 
 ```{r}
 #| include: false
@@ -181,7 +174,7 @@ source("scripts/indel analysis.R")
 ## Frequency of missing guide sites
 
 ```{r}
-knitr::include_graphics('figures/Percentages.png')
+knitr::include_graphics('figures/Upset.png')
 ```
 
 ## Venn diagram of missing guide sites
@@ -189,5 +182,3 @@ knitr::include_graphics('figures/Percentages.png')
 ```{r}
 knitr::include_graphics('figures/Venn.png')
 ```
-
-

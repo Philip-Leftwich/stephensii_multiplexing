@@ -70,9 +70,14 @@ pwalk(
   tibble(
     data = list(fig_1b, fig_2c, fig_3b, fig_3d),
     fig_mean = list(fig_1b_mean, fig_2c_mean, fig_3b_mean, fig_3d_mean),
-    colours = list(colours_fig_1b, colours_fig_2c, colours_fig_3b, colours_fig_3d)
+    colours = list(colours_fig_1b, colours_fig_2c, colours_fig_3b, colours_fig_3d),
+    figures = list("fig 1b", "fig 2c", "fig 3b", "fig 3d")
   ),
-  ~ homing_plots(..1,..2,..3)
+  ~ {
+   p <-  homing_plots(..1,..2,..3)
+   ggsave(glue::glue("figures/{..4}_homing_plot.png"),
+          p,
+          dpi = 900, width = 9, height = 6, units = "in")
+  }
 )
 
-# ggsave("figures/homing_plot.png", dpi = 900, width = 9, height = 6, units = "in")

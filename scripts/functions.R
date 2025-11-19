@@ -16,7 +16,8 @@ required <- list("tidyverse",
                 "ggtext",
                 "DHARMa",
                 "ggcorrplot",
-                "showtext")
+                "showtext",
+                "glue")
 
 lapply(required, library, character.only = T)
 
@@ -101,7 +102,7 @@ homing_plots <- function(.df, .means, .colours="grey10", facet = TRUE){
     scale_colour_manual(values = .colours)+
     scale_fill_manual(values = after_scale(desaturate(lighten(.colours, .8), .2)))+
     theme_custom()+
-    theme(strip.text = element_markdown(),
+    theme(strip.text.x = element_markdown(),
           axis.text.x = element_markdown())
   
   
