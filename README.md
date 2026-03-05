@@ -81,6 +81,23 @@ This repository is licensed under the [MIT License](./LICENSE).
 
 ---
 
+## R packages used
+Package	Version	Citation
+arm	1.13.1	Gelman and Su (2022)
+base	4.3.3	R Core Team (2024)
+brglm	0.7.2	Kosmidis (2021); Kosmidis and Firth (2021)
+DHARMa	0.4.6	Hartig (2022)
+emmeans	1.10.6	Lenth (2024)
+glue	1.8.0	Hester and Bryan (2024)
+gt	0.11.1	Iannone et al. (2024)
+scales	1.4.0	Wickham, Pedersen, and Seidel (2025)
+showtext	0.9.6	Qiu and See file AUTHORS for details. (2023)
+sjPlot	2.8.16	Lüdecke (2024)
+viridis	0.6.5	Garnier et al. (2024)
+
+
+---
+
 ## Contact
 
 For questions, please contact:  
