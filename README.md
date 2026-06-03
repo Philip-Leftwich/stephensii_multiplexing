@@ -12,7 +12,7 @@ Mireia Larrosa Godall¹³⁴, Lewis Shackleford¹²³, Matthew P. Edgington¹²�
 
 **Keywords:** mosquito, CRISPR-Cas9, malaria
 
-[![DOI](https://zenodo.org/badge/699914346.svg)](https://doi.org/10.5281/zenodo.18877590)
+![DOI](https://zenodo.org/badge/699914346.svg)](https://doi.org/10.5281/zenodo.18877590)
 
 ---
 
